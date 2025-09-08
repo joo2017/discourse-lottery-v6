@@ -25,9 +25,13 @@ after_initialize do
   require_relative "lib/discourse_lottery_v6/lottery_validator"
   require_relative "lib/discourse_lottery_v6/lottery_creator"
   require_relative "lib/discourse_lottery_v6/post_extension"
+  require_relative "app/models/discourse_lottery_v6/lottery"
+  require_relative "app/models/discourse_lottery_v6/participant"
+  require_relative "app/serializers/discourse_lottery_v6/lottery_serializer"
 
   # 2. 设置 BBCode 解析规则
-  DiscourseLotteryV6::DiscourseMarkdown.setup
+  # 将 Discourse::Markdown 作为参数传递
+  DiscourseLotteryV6::DiscourseMarkdown.setup(Discourse::Markdown)
 
   # 3. 允许我们的 div 和 data-* 属性通过 HTML sanitizer
   customize_html_whitelist do |whitelist|
@@ -55,8 +59,6 @@ after_initialize do
     :lottery,
     include_condition: -> { SiteSetting.lottery_enabled? && object.is_first_post? && object.lottery.present? },
   ) do
-    # 确保序列化器类存在
-    require_relative "app/serializers/discourse_lottery_v6/lottery_serializer"
     DiscourseLotteryV6::LotterySerializer.new(object.lottery, scope: scope, root: false).as_json
   end
 
