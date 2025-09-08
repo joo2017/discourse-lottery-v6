@@ -1,0 +1,20 @@
+.discourse-lottery {
+  // 预览时的占位符样式
+  border: 2px dashed var(--primary-low);
+  padding: 1em;
+  min-height: 50px;
+  border-radius: var(--d-border-radius);
+  background-color: var(--primary-very-low);
+}
+
+.discourse-lottery-info-card {
+  border: 1px solid var(--primary-low);
+  border-radius: var(--d-border-radius);
+  padding: 1em;
+  margin-bottom: 1em;
+  background-color: var(--primary-very-low);
+
+  h3 {
+    margin-top: 0;
+  }
+}
