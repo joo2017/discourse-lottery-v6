@@ -19,18 +19,17 @@ require_relative "lib/discourse_lottery_v6/engine"
 after_initialize do
   # --- 所有插件逻辑都从这里开始 ---
 
-  # 1. 加载所有依赖文件
-  require_relative "lib/discourse_markdown/discourse_lottery"
-  require_relative "lib/discourse_lottery_v6/lottery_parser"
-  require_relative "lib/discourse_lottery_v6/lottery_validator"
-  require_relative "lib/discourse_lottery_v6/lottery_creator"
-  require_relative "lib/discourse_lottery_v6/post_extension"
-  require_relative "app/models/discourse_lottery_v6/lottery"
-  require_relative "app/models/discourse_lottery_v6/participant"
-  require_relative "app/serializers/discourse_lottery_v6/lottery_serializer"
+  # 1. 加载所有依赖文件 (确保包含 .rb 扩展名)
+  require_relative "lib/discourse_markdown/discourse_lottery.rb"
+  require_relative "lib/discourse_lottery_v6/lottery_parser.rb"
+  require_relative "lib/discourse_lottery_v6/lottery_validator.rb"
+  require_relative "lib/discourse_lottery_v6/lottery_creator.rb"
+  require_relative "lib/discourse_lottery_v6/post_extension.rb"
+  require_relative "app/models/discourse_lottery_v6/lottery.rb"
+  require_relative "app/models/discourse_lottery_v6/participant.rb"
+  require_relative "app/serializers/discourse_lottery_v6/lottery_serializer.rb"
 
   # 2. 设置 BBCode 解析规则
-  # 将 Discourse::Markdown 作为参数传递
   DiscourseLotteryV6::DiscourseMarkdown.setup(Discourse::Markdown)
 
   # 3. 允许我们的 div 和 data-* 属性通过 HTML sanitizer
