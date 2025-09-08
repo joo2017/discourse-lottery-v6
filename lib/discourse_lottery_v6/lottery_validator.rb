@@ -12,7 +12,7 @@ module DiscourseLotteryV6
       return true if @lotteries_data.empty?
 
       if @lotteries_data.count > 1
-        @post.errors.add(:base, "一个帖子中只能有一个抽奖活动。") # Simplified Chinese for error
+        @post.errors.add(:base, "一个帖子中只能有一个抽奖活动。")
         return false
       end
 
@@ -25,7 +25,7 @@ module DiscourseLotteryV6
 
       unless lottery_data[:draw_at].present? && lottery_data[:winner_count].present? &&
                lottery_data[:min_participants].present?
-        @post.errors.add(:base, "抽奖缺少必要参数：开奖时间、获奖人数、参与门槛。")
+        @post.errors.add(:base, "抽奖缺少必要参数：开奖时间 (draw_at)、获奖人数 (winner_count)、参与门槛 (min_participants)。")
         return false
       end
 
