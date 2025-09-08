@@ -16,7 +16,6 @@ module DiscourseLotteryV6
 
     def self.extract(post)
       cooked = PrettyText.cook(post.raw, topic_id: post.topic_id, user_id: post.user_id)
-
       Nokogiri
         .HTML(cooked)
         .css("div.discourse-lottery")
@@ -24,7 +23,7 @@ module DiscourseLotteryV6
           lottery_data = {}
           lottery_node.attributes.each do |key, attr|
             if key.start_with?("data-")
-              option_name = key.sub("data-", "").to_sym
+              option_name = key.sub("data-", "").tr("-", "_").to_sym
               if VALID_OPTIONS.include?(option_name.to_s)
                 lottery_data[option_name] = CGI.escapeHTML(attr.value || "")
               end
