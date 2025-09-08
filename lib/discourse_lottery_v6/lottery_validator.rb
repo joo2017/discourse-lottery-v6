@@ -8,41 +8,32 @@ module DiscourseLotteryV6
     end
 
     def validate
-      # 确保插件已启用
-      return false unless SiteSetting.lottery_enabled?
+      return true unless SiteSetting.lottery_enabled?
+      return true if @lotteries_data.empty?
 
-      # 一个帖子只能有一个抽奖
       if @lotteries_data.count > 1
-        @post.errors.add(:base, I18n.t("plugins.lottery.errors.multiple_lotteries"))
+        @post.errors.add(:base, "一个帖子中只能有一个抽奖活动。") # Simplified Chinese for error
         return false
       end
 
-      return true if @lotteries_data.empty? # 如果没有抽奖，则跳过验证
-
-      # 抽奖必须在首帖
       unless @post.is_first_post?
-        @post.errors.add(:base, I18n.t("plugins.lottery.errors.must_be_in_first_post"))
+        @post.errors.add(:base, "抽奖活动必须位于主题的第一个帖子中。")
         return false
       end
 
       lottery_data = @lotteries_data.first
 
-      # 验证必填项
       unless lottery_data[:draw_at].present? && lottery_data[:winner_count].present? &&
                lottery_data[:min_participants].present?
-        @post.errors.add(:base, I18n.t("plugins.lottery.errors.missing_required_fields"))
+        @post.errors.add(:base, "抽奖缺少必要参数：开奖时间、获奖人数、参与门槛。")
         return false
       end
 
-      # 验证参与门槛
       min_participants = lottery_data[:min_participants].to_i
       if min_participants < SiteSetting.lottery_min_participants_global
         @post.errors.add(
           :base,
-          I18n.t(
-            "plugins.lottery.errors.min_participants_too_low",
-            min: SiteSetting.lottery_min_participants_global,
-          ),
+          "参与门槛不能低于全局设置的最小值 (#{SiteSetting.lottery_min_participants_global})。"
         )
         return false
       end
