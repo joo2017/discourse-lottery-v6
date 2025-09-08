@@ -18,7 +18,7 @@ module DiscourseLotteryV6
 
       if lottery_data[:specified_winners].present?
         lottery.draw_type = :specified
-        winner_floors = lottery_data[:specified_winners].split(",").map(&:to_i).reject(&:zero?)
+        winner_floors = lottery_data[:specified_winners].to_s.split(",").map(&:to_i).reject(&:zero?)
         lottery.winner_count = winner_floors.size
         lottery.specified_winners = winner_floors
       else
@@ -27,7 +27,7 @@ module DiscourseLotteryV6
         lottery.specified_winners = []
       end
 
-      lottery.draw_at = Time.zone.parse(lottery_data[:draw_at]) rescue nil
+      lottery.draw_at = Time.zone.parse(lottery_data[:draw_at].to_s) rescue nil
       lottery.min_participants = lottery_data[:min_participants].to_i
       lottery.backup_strategy = lottery_data[:backup_strategy] || :proceed
       lottery.name = lottery_data[:name]
@@ -37,23 +37,10 @@ module DiscourseLotteryV6
       lottery.status = :running
 
       if lottery.save
-        schedule_jobs(lottery)
+        # schedule_jobs(lottery) # 暂时注释
       else
         Rails.logger.error("[DiscourseLotteryV6] Lottery save failed for post #{@post.id}: #{lottery.errors.full_messages.join(", ")}")
       end
-    end
-
-    private
-
-    def schedule_jobs(lottery)
-      # Jobs.cancel_scheduled_job(:execute_lottery_draw, lottery_id: lottery.id)
-      # Jobs.enqueue_at(lottery.draw_at, :execute_lottery_draw, lottery_id: lottery.id)
-      #
-      # lock_delay = SiteSetting.lottery_post_lock_delay_minutes
-      # if lock_delay > 0
-      #   Jobs.cancel_scheduled_job(:lock_lottery_post, post_id: @post.id)
-      #   Jobs.enqueue_in(lock_delay.minutes, :lock_lottery_post, post_id: @post.id)
-      # end
     end
   end
 end
