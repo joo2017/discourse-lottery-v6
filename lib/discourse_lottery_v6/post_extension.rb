@@ -16,7 +16,6 @@ module DiscourseLotteryV6
     private
 
     def validate_lottery
-      # 仅在首帖进行验证
       return unless self.is_first_post?
       validator = DiscourseLotteryV6::LotteryValidator.new(self)
       validator.validate
