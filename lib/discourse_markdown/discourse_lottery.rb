@@ -1,11 +1,10 @@
 # frozen_string_literal: true
-
 # 路径: discourse-lottery-v6/lib/discourse_markdown/discourse_lottery.rb
 
 module DiscourseLotteryV6
   module DiscourseMarkdown
-    def self.setup
-      Discourse::Markdown.register_bbcode("lottery", "div") do |bbcode|
+    def self.setup(discourse_markdown_klass)
+      discourse_markdown_klass.register_bbcode("lottery", "div") do |bbcode|
         attrs =
           %w[
             name
