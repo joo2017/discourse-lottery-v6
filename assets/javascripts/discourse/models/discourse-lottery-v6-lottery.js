@@ -1,43 +1,35 @@
-import { tracked } from "@glimmer/tracking";
+# frozen_string_literal: true
 
-export default class DiscourseLotteryV6Lottery {
-  @tracked name;
-  @tracked draw_at;
-  @tracked winner_count;
-  @tracked min_participants;
-  @tracked status;
-  @tracked backup_strategy;
-  @tracked specified_winners;
-  @tracked participants_count;
-  @tracked winners;
+# 路径: discourse-lottery-v6/app/models/discourse_lottery_v6/lottery.rb
 
-  static create(args = {}) {
-    return new DiscourseLotteryV6Lottery(args);
-  }
+module DiscourseLotteryV6
+  class Lottery < ActiveRecord::Base
+    self.table_name = "discourse_lottery_lotteries"
 
-  constructor(args = {}) {
-    this.id = args.id;
-    this.post_id = args.post_id;
-    this.name = args.name;
-    this.draw_at = args.draw_at;
-    this.winner_count = args.winner_count;
-    this.min_participants = args.min_participants;
-    this.status = args.status;
-    this.backup_strategy = args.backup_strategy;
-    this.specified_winners = args.specified_winners;
-    this.participants_count = args.participants_count || 0;
-    this.winners = args.winners || [];
-  }
+    # --- 修正开始 ---
+    # 在定义关联之前，先定义 enums
+    # 明确地将属性名作为第一个参数传递给 enum 方法
+    enum :status, { running: 0, finished: 1, cancelled: 2 }
+    enum :draw_type, { random: 0, specified: 1 }
+    enum :backup_strategy, { proceed: 0, cancel: 1 }
+    # --- 修正结束 ---
 
-  get isRunning() {
-    return this.status === "running";
-  }
+    belongs_to :post, class_name: "Post"
+    has_many :participants,
+             class_name: "DiscourseLotteryV6::Participant",
+             foreign_key: :lottery_id,
+             dependent: :destroy
 
-  get isFinished() {
-    return this.status === "finished";
-  }
+    validates :draw_at, presence: true
+    validates :winner_count, presence: true, numericality: { greater_than: 0 }
+    validates :min_participants,
+              presence: true,
+              numericality: {
+                greater_than_or_equal_to: 0,
+              }
 
-  get isCancelled() {
-    return this.status === "cancelled";
-  }
-}
+    def topic
+      post&.topic
+    end
+  end
+end
