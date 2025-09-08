@@ -19,12 +19,15 @@ require_relative "lib/discourse_lottery_v6/engine"
 after_initialize do
   # --- 所有插件逻辑都从这里开始 ---
 
-  # 1. 加载非自动加载的核心逻辑文件
+  # 1. 加载所有依赖文件 (确保包含 .rb 扩展名)
   require_relative "lib/discourse_markdown/discourse_lottery.rb"
   require_relative "lib/discourse_lottery_v6/lottery_parser.rb"
   require_relative "lib/discourse_lottery_v6/lottery_validator.rb"
   require_relative "lib/discourse_lottery_v6/lottery_creator.rb"
   require_relative "lib/discourse_lottery_v6/post_extension.rb"
+  require_relative "app/models/discourse_lottery_v6/lottery.rb"
+  require_relative "app/models/discourse_lottery_v6/participant.rb"
+  require_relative "app/serializers/discourse_lottery_v6/lottery_serializer.rb"
 
   # 2. 设置 BBCode 解析规则
   DiscourseLotteryV6::DiscourseMarkdown.setup(Discourse::Markdown)
@@ -47,7 +50,6 @@ after_initialize do
   end
 
   # 4. 将我们的扩展应用到 Post 模型
-  #    reloadable_patch 确保在开发模式下修改 PostExtension 文件时能自动重载
   reloadable_patch { Post.prepend(DiscourseLotteryV6::PostExtension) }
 
   # 5. 将 Lottery 数据添加到 Post 序列化器中
