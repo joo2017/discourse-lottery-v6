@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 # 路径: discourse-lottery-v6/lib/discourse_markdown/discourse_lottery.rb
 
 module DiscourseLotteryV6
