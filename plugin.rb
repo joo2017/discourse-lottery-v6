@@ -31,14 +31,13 @@ after_initialize do
   add_to_serializer(
     :post,
     :lottery,
-    include_condition: -> { SiteSetting.lottery_enabled? && object.lottery.present? },
+    include_condition: -> { SiteSetting.lottery_enabled? && object.is_first_post? && object.lottery.present? },
   ) do
     DiscourseLotteryV6::LotterySerializer.new(object.lottery, scope: scope, root: false).as_json
   end
 
   # 监听帖子创建和编辑事件
   on(:post_created) do |post, opts, user|
-    # 确保是首帖
     if post.is_first_post?
       DiscourseLotteryV6::LotteryCreator.new(post).create_or_update
     end
@@ -49,7 +48,7 @@ after_initialize do
       DiscourseLotteryV6::LotteryCreator.new(post).create_or_update
     end
   end
-
+  
   # 允许我们的div和data-*属性通过HTML sanitizer
   customize_html_whitelist do |whitelist|
     whitelist[:attributes]["div"].concat(%w[
@@ -60,6 +59,8 @@ after_initialize do
       data-status
       data-backup_strategy
       data-specified_winners
+      data-prize_image_url
+      data-notes
     ])
   end
 end
